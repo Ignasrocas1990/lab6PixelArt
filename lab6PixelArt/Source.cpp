@@ -29,7 +29,7 @@ const Color colorArray[] = { Color(103, 103, 103),Color::Blue,Color::Red,Color::
 RectangleShape gridPeace;
 RectangleShape panel;
 int grid[rows][colms] = {0};
-RectangleShape gridDisplay[rows][colms];
+//RectangleShape gridDisplay[rows][colms];
 
 vector<RectangleShape> mainPanels;
 vector<RectangleShape> panels;
@@ -90,7 +90,7 @@ void loadFile() {
 			}
 	}
 }
-
+/*
 void createGrid(int xposs=400) {
 	int pSize = 0;
 	int yposs = 0;
@@ -108,7 +108,7 @@ void createGrid(int xposs=400) {
 	}
 
 }
-
+*/
 
 int main()
 {
@@ -223,7 +223,7 @@ int main()
 	int rectangeX = 0, rectangeY = 0;
 	string selectedTool="";
 	multimap<int, int>rectXYmap;
-	createGrid();
+
 	while (window.isOpen())
 	{
 		 gridRow = 0, gridColumn = 0;
@@ -268,7 +268,7 @@ int main()
 				}
 
 			}
-			if (selectedTool == "Pencil" || selectedTool=="Rectangle") {
+			if (selectedTool == "Pencil" || selectedTool=="Rectangle") {//get color
 
 				if (Mouse::isButtonPressed(Mouse::Left))// if button clicked
 				{
@@ -330,11 +330,11 @@ int main()
 				}
 				rectXYmap.clear();//-------------------------continue here
 				bool set = false;
-				bool first=true;
-				bool drawn = false;
+				bool firsTime=true;
+				bool draw = true;
 				int orgColumn = 0, orgRow = 0;
-				int newPossX=0, newPossY = 0;
 				int prevColumn = 0, prevRow = 0;
+
 				while (Mouse::isButtonPressed(Mouse::Left) && currColorInteger > -1)// while it is selected
 				{
 					mousePx = Mouse::getPosition(window).x;
@@ -345,105 +345,92 @@ int main()
 							orgRow = (mousePy / gSquareSize); // original y column
 							set = true;
 						}
-						prevColumn = gridColumn;
-						prevRow = gridRow;
 
 						gridColumn = (mousePx - leftPanelW) / gSquareSize;
 						gridRow = mousePy / gSquareSize;
-						cout << "Cur C,R: " << gridColumn << " " << gridRow << endl;//--------------------wrong They both the same;
-						cout << "Prev C,R: " << prevColumn << " " << prevRow << endl;
 
 						if (prevColumn == gridColumn && prevRow == gridRow) {
-								rectXYmap.clear();
-								drawn = true;
+								
+								draw = false;
 						}
-						else {
+						else{
+							prevColumn = gridColumn;
+							prevRow = gridRow;
+							cout << rectXYmap.size() <<endl;
+
 							for (auto i = rectXYmap.begin();i != rectXYmap.end();i++) {
 
-								gridDisplay[i->first][i->second].setFillColor(Color::Black);
-								window.draw(gridDisplay[i->first][i->second]);
+								set_gridPeace(leftPanelW + i->second * gSquareSize, i->first * gSquareSize);//set Square at this location
+								gridPeace.setFillColor(colorArray[currColorInteger]);
+								window.draw(gridPeace);
+								window.display();
 							}
-							window.display();
-							drawn = false;
+							rectXYmap.clear();
+							draw = true;
 						}
-						newPossX = leftPanelW + gridColumn * gSquareSize;//calculate next column coppision
-						newPossY = gridRow * gSquareSize;
 
-						if (first) {
+
+						if (firsTime) {
 							set_gridPeace(leftPanelW + gridColumn * gSquareSize, gridRow* gSquareSize);//set Square at this location
 							grid[gridRow][gridColumn] = currColorInteger;
 							window.draw(gridPeace);
 							window.display();
-							first = false;
+							firsTime = false;
 						}
-						else if ((orgColumn != gridColumn || orgRow != gridRow)&& !drawn) {
-
-							//set_gridPeace(newPossX, newPossY);//set Square at this location
-							//grid[gridRow][gridColumn] = currColorInteger;
-							//window.draw(gridPeace);
-							//window.display();
+						else if ((orgColumn != gridColumn || orgRow != gridRow)&& draw==true) {
 
 							int cAcross = (orgColumn - gridColumn);//gives you how many columns need till 0 (back to the start)
 							int rDown = (orgRow - gridRow);// gives you how many rows needed till 0(b to start)(use abs()back to 0)
-							int temX=0;
-							int temY=0;
-							int inC = 1;
-							int decRow = 1;
+
 							if (cAcross<=0 && rDown<=0) {
-								index = 0;
+
 								for (int c = orgColumn;c <= gridColumn;c++) {
 								
-										//temX -= gSquareSize;
-										//set_gridPeace(temX, newPossY);//set Square at this location
-										//gridPeace.setFillColor(colorArray[currColorInteger]);
-										//grid[gridRow][gridColumn - decColumn++] = currColorInteger;
-										//gridDisplay[gridRow][gridColumn - decColumn++] = gridPeace;
-										//gridColumn -= decColumn++;
 
-										gridDisplay[orgRow][c].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[orgRow][c]);
+										set_gridPeace(leftPanelW + c * gSquareSize, orgRow* gSquareSize);//set Square at this location
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 
-										//temY = gridColumn + inC++;
-										gridDisplay[gridRow][c].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[gridRow][c]);
+										set_gridPeace(leftPanelW + c * gSquareSize, gridRow * gSquareSize);//set Square at this location
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+
+										window.draw(gridPeace);
 										
 										rectXYmap.insert({ orgRow,c });
 										rectXYmap.insert({ gridRow,c });		
 								}
 								for (int r = orgRow;r <= gridRow; r++) {
-										//temY -= gSquareSize;
-										//set_gridPeace(newPossX, temY);//set Square at this location
-										//gridPeace.setFillColor(colorArray[currColorInteger]);
-										//grid[gridRow - decRow++][gridColumn] = currColorInteger;
-										//window.draw(gridPeace);
 
-										//temX = gridRow - decRow++;
-										gridDisplay[r][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[r][orgColumn]);
+
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, r * gSquareSize);//set Square at this location
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 									
-										gridDisplay[r][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[r][gridColumn]);
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, r * gSquareSize);//set Square at this location
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+
+										window.draw(gridPeace);
 
 
 										rectXYmap.insert({ r,orgColumn });
 										rectXYmap.insert({ r,gridColumn });
-
-									//rDown++;
-									//cAcross++;
-
 								}
 								window.display();
-								
+								draw = false;
 							}
-							cout << cAcross<<" "<< rDown<<'\n';
+							//cout << cAcross<<" "<< rDown<<'\n';
 
-
+							
 						}
 
 					}
 
 
 					
+				}
+				for (auto i = rectXYmap.begin();i != rectXYmap.end();i++) {
+
+					grid[i->first][i->second] = currColorInteger;
 				}
 
 
@@ -473,11 +460,10 @@ int main()
 
 
 			}
-			window.clear();//----draw static things after here
+			window.clear();
 			
-			
+			/*
 			int dsiplayColor=0;
-
 			for (int r = 0;r < rows;r++) {
 				for (int c = 0;c < colms;c++) {
 					dsiplayColor=grid[r][c];
@@ -490,9 +476,10 @@ int main()
 					window.draw(gridDisplay[r][c]);
 				}
 			}
+			*/
 			//--------------------------------------------
-			/*
 			
+			//with no pre-made grid
 			int pSize = 0;
 			int yposs = 0;
 			int temp = 0;
@@ -509,8 +496,7 @@ int main()
 				}
 				pSize = gSquareSize;
 			}
-			*/
-			//-------------------------------------------
+			
 			for (index = 0;index < mainPanels.size();index++) {//draw panels
 				window.draw(mainPanels[index]);
 
