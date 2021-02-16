@@ -222,7 +222,8 @@ int main()
 	int gridRow = 0, gridColumn = 0;
 	int rectangeX = 0, rectangeY = 0;
 	string selectedTool="";
-	multimap<int, int>rectXYmap;
+	multimap<int, int>show_map;
+	multimap<int, int>keep_map;
 
 	while (window.isOpen())
 	{
@@ -328,7 +329,8 @@ int main()
 					currColorInteger = -1;
 					switched = false;
 				}
-				rectXYmap.clear();//-------------------------continue here
+				show_map.clear();
+				keep_map.clear();
 				bool set = false;
 				bool firsTime=true;
 				bool draw = true;
@@ -352,25 +354,27 @@ int main()
 						if (prevColumn == gridColumn && prevRow == gridRow) {
 								
 								draw = false;
+
 						}
 						else{
 							prevColumn = gridColumn;
 							prevRow = gridRow;
-							cout << rectXYmap.size() <<endl;
-
-							for (auto i = rectXYmap.begin();i != rectXYmap.end();i++) {
+							show_map.insert(keep_map.begin(), keep_map.end());
+							for (auto i = show_map.begin();i != show_map.end();i++) {
 
 								set_gridPeace(leftPanelW + i->second * gSquareSize, i->first * gSquareSize);//set Square at this location
-								gridPeace.setFillColor(colorArray[currColorInteger]);
+								gridPeace.setFillColor(colorArray[zero]);
 								window.draw(gridPeace);
-								window.display();
+
+								
+								//keep_map = show_map;
 							}
-							rectXYmap.clear();
+							keep_map.clear();
 							draw = true;
 						}
 
 
-						if (firsTime) {
+						if (firsTime==true) {
 							set_gridPeace(leftPanelW + gridColumn * gSquareSize, gridRow* gSquareSize);//set Square at this location
 							grid[gridRow][gridColumn] = currColorInteger;
 							window.draw(gridPeace);
@@ -378,49 +382,108 @@ int main()
 							firsTime = false;
 						}
 						else if ((orgColumn != gridColumn || orgRow != gridRow)&& draw==true) {
-
+							
 							int cAcross = (orgColumn - gridColumn);//gives you how many columns need till 0 (back to the start)
 							int rDown = (orgRow - gridRow);// gives you how many rows needed till 0(b to start)(use abs()back to 0)
 
-							if (cAcross<=0 && rDown<=0) {
+							if (cAcross <= 0) {//right & (up || down)
 
-								for (int c = orgColumn;c <= gridColumn;c++) {
-								
+								for (int c = orgColumn;c <= gridColumn;c++) {//right
 
-										set_gridPeace(leftPanelW + c * gSquareSize, orgRow* gSquareSize);//set Square at this location
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
 
-										set_gridPeace(leftPanelW + c * gSquareSize, gridRow * gSquareSize);//set Square at this location
-										gridPeace.setFillColor(colorArray[currColorInteger]);
+									set_gridPeace(leftPanelW + c * gSquareSize, orgRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
 
-										window.draw(gridPeace);
-										
-										rectXYmap.insert({ orgRow,c });
-										rectXYmap.insert({ gridRow,c });		
+									set_gridPeace(leftPanelW + c * gSquareSize, gridRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
+
+									keep_map.insert({ orgRow,c });
+									keep_map.insert({ gridRow,c });
 								}
-								for (int r = orgRow;r <= gridRow; r++) {
+								if (rDown > 0) {
+									for (int r = orgRow;r >= gridRow; r--) {//up
 
 
-										set_gridPeace(leftPanelW + orgColumn * gSquareSize, r * gSquareSize);//set Square at this location
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, r * gSquareSize);
 										gridPeace.setFillColor(colorArray[currColorInteger]);
 										window.draw(gridPeace);
-									
-										set_gridPeace(leftPanelW + gridColumn * gSquareSize, r * gSquareSize);//set Square at this location
-										gridPeace.setFillColor(colorArray[currColorInteger]);
 
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
 										window.draw(gridPeace);
 
-
-										rectXYmap.insert({ r,orgColumn });
-										rectXYmap.insert({ r,gridColumn });
+										keep_map.insert({ r,orgColumn });
+										keep_map.insert({ r,gridColumn });
+									}
 								}
-								window.display();
-								draw = false;
+								else {
+									for (int r = orgRow;r <= gridRow; r++) {//down
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										keep_map.insert({ r,orgColumn });
+										keep_map.insert({ r,gridColumn });
+									}
+								}
 							}
-							//cout << cAcross<<" "<< rDown<<'\n';
+							else if (cAcross > 0) { //left & (down || UP )
 
-							
+								for (int c = orgColumn;c > gridColumn;c--) {
+
+
+									set_gridPeace(leftPanelW + c * gSquareSize, orgRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
+
+									set_gridPeace(leftPanelW + c * gSquareSize, gridRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
+
+									keep_map.insert({ orgRow,c });
+									keep_map.insert({ gridRow,c });
+								}
+								if (rDown <= 0) {
+									for (int r = orgRow;r <= gridRow; r++) {//down
+
+
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										keep_map.insert({ r,orgColumn });
+										keep_map.insert({ r,gridColumn });
+									}
+								}
+								else {
+									for (int r = orgRow;r >= gridRow; r--) {//up
+
+
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, r * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										keep_map.insert({ r,orgColumn });
+										keep_map.insert({ r,gridColumn });
+										}
+									}
+							}
+							window.display();
+							draw = false;
 						}
 
 					}
@@ -428,7 +491,7 @@ int main()
 
 					
 				}
-				for (auto i = rectXYmap.begin();i != rectXYmap.end();i++) {
+				for (auto i = keep_map.begin();i != keep_map.end();i++) {
 
 					grid[i->first][i->second] = currColorInteger;
 				}
