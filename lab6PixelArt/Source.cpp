@@ -121,7 +121,7 @@ int main()
 	int lPanelBlocksW = leftPanelW / 3;
 	bool switched = false;
 	const int numOfColourButtons = 4,numOfTools=6;
-	const string tools[] = { "Rubber","Pencil","Picker","Rectangle","copy_paste",""};
+	const string tools[] = { "Rubber","Pencil","Picker","Rectangle","Copy_paste","empty"};
 
 
 	//create Window
@@ -194,12 +194,14 @@ int main()
 	rectangleBtn.setTexture(rectangleTexture);
 	rectangleBtn.setPosition(leftPanelW / two+10, (leftPanelW/two)-10);
 	rectangleBtn.scale(0.074, 0.08);
+	rectangleBtn.setColor(Color::Red);
+
 
 	Texture copy_paste;
 	copy_paste.loadFromFile("copy.png");
 	Sprite copy_pasteBtn;
 	copy_pasteBtn.setTexture(copy_paste);
-	copy_pasteBtn.setPosition(gSquareSize * 2+5, (height / 4)-32);
+	copy_pasteBtn.setPosition(gSquareSize * 2+5,(height / 4)-32);
 	copy_pasteBtn.scale(0.49, 0.49);
 
 
@@ -345,7 +347,7 @@ int main()
 
 				}
 			}
-			if (selectedTool=="Rectangle")
+			else if (selectedTool=="Rectangle")
 			{
 				if (switched) {//check if swtiched and set color to null(so it does not draw)
 					currColorInteger = -1;
@@ -583,12 +585,11 @@ int main()
 				window.draw(mainPanels[index]);
 
 			}
-
 			for (index = 0;index < panels.size();index++) {//draw panels
 				window.draw(panels[index]);
 
 			}
-			for (int i = 0; i < numOfColourButtons; i++)
+			for (i = 0; i < numOfColourButtons; i++)
 			{
 				window.draw(colourButtons[i]);
 			}	
@@ -611,7 +612,6 @@ int main()
 			window.draw(pickerButton);
 			window.draw(rectangleBtn);
 			window.draw(copy_pasteBtn);
-			//window.draw(exampleText);
 			window.display();
 
 			// reset the timeSinceLastUpdate to 0 
