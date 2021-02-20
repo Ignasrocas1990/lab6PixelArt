@@ -151,15 +151,11 @@ int main()
 		colourButtons[i].setPosition(colorSpaceX+ gSquareSize +(i* gSquareSize), gSquareSize);
 		colourButtons[i].setFillColor(colorArray[i+1]);
 	}
-
-	set_rectange(colorSpaceW, colorSpaceH, colorSpaceX,zero);//draw color space
-	mainPanels.push_back(panel);
-
-
-
 	set_rectange(leftPanelW, height, zero, zero);//draw left panel
 	mainPanels.push_back(panel);
 
+	set_rectange(colorSpaceW, colorSpaceH, colorSpaceX,zero);//draw color space
+	mainPanels.push_back(panel);
 
 	Texture pencilTexture;
 	if (!pencilTexture.loadFromFile("pen.png"))//-----------need class array loop...
@@ -263,7 +259,7 @@ int main()
 				mousePx = Mouse::getPosition(window).x;
 				mousePy = Mouse::getPosition(window).y;
 
-				if (mainPanels[zero].getLocalBounds().contains(mousePx, mousePy)) {//check if left panel clicked on
+				if (mainPanels[zero].getGlobalBounds().contains(mousePx, mousePy)) {//check if left panel clicked on
 					for (int i = 0;i < numOfTools;i++) {
 						if (panels[i].getGlobalBounds().contains(mousePx, mousePy)) {
 							selectedTool = tools[i];//gets selected tool keyword
@@ -347,7 +343,7 @@ int main()
 
 				}
 			}
-			else if (selectedTool=="Rectangle")
+			if (selectedTool=="Rectangle")
 			{
 				if (switched) {//check if swtiched and set color to null(so it does not draw)
 					currColorInteger = -1;
