@@ -120,8 +120,8 @@ int main()
 	int mousePx = 0, mousePy = 0;
 	int lPanelBlocksW = leftPanelW / 3;
 	bool switched = false;
-	const int numOfColourButtons = 4,numOfTools=4;
-	const string tools[] = { "Rubber","Pencil","Picker","Rectangle"};
+	const int numOfColourButtons = 4,numOfTools=6;
+	const string tools[] = { "Rubber","Pencil","Picker","Rectangle","copy_paste",""};
 
 
 	//create Window
@@ -195,12 +195,17 @@ int main()
 	rectangleBtn.setPosition(leftPanelW / two+10, (leftPanelW/two)-10);
 	rectangleBtn.scale(0.074, 0.08);
 
-
+	Texture copy_paste;
+	copy_paste.loadFromFile("copy.png");
+	Sprite copy_pasteBtn;
+	copy_pasteBtn.setTexture(copy_paste);
+	copy_pasteBtn.setPosition(gSquareSize * 2+5, (height / 4)-32);
+	copy_pasteBtn.scale(0.49, 0.49);
 
 
 
 	int possX = gSquareSize*2,possY= gSquareSize;
-	for (int index = 1;index <= numOfTools; index++) {//create left panel small blocks
+	for (int index = 1;index <= numOfTools; index++) {//create left panel tool blocks
 		if (index%two==one) {
 			set_rectange(lPanelBlocksW, lPanelBlocksW, possX, possY);
 			possX += lPanelBlocksW + gSquareSize;
@@ -605,6 +610,7 @@ int main()
 			window.draw(rubberButton);
 			window.draw(pickerButton);
 			window.draw(rectangleBtn);
+			window.draw(copy_pasteBtn);
 			//window.draw(exampleText);
 			window.display();
 
