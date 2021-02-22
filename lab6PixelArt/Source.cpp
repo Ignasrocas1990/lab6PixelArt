@@ -29,7 +29,7 @@ const Color colorArray[] = { Color(103, 103, 103),Color::Blue,Color::Red,Color::
 RectangleShape gridPeace;
 RectangleShape panel;
 int grid[rows][colms] = {0};
-RectangleShape gridDisplay[rows][colms];
+//RectangleShape gridDisplay[rows][colms];
 
 vector<RectangleShape> mainPanels;
 vector<RectangleShape> panels;
@@ -88,7 +88,7 @@ void loadFile() {
 			}
 	}
 }
-
+/*
 void createGrid(int xposs=400) {
 	int pSize = 0;
 	int yposs = 0;
@@ -106,7 +106,7 @@ void createGrid(int xposs=400) {
 	}
 
 }
-
+*/
 
 int main()
 {
@@ -149,15 +149,11 @@ int main()
 		colourButtons[i].setPosition(colorSpaceX+ gSquareSize +(i* gSquareSize), gSquareSize);
 		colourButtons[i].setFillColor(colorArray[i+1]);
 	}
-
-	set_rectange(colorSpaceW, colorSpaceH, colorSpaceX,zero);//draw color space
-	mainPanels.push_back(panel);
-
-
-
 	set_rectange(leftPanelW, height, zero, zero);//draw left panel
 	mainPanels.push_back(panel);
 
+	set_rectange(colorSpaceW, colorSpaceH, colorSpaceX,zero);//draw color space
+	mainPanels.push_back(panel);
 
 	Texture pencilTexture;
 	if (!pencilTexture.loadFromFile("pen.png"))//-----------need class array loop...
@@ -203,7 +199,7 @@ int main()
 	copy_pasteBtn.scale(0.49, 0.49);
 
 
-	createGrid();
+
 	int possX = gSquareSize*2,possY= gSquareSize;
 	for (int index = 1;index <= numOfTools; index++) {//create left panel tool blocks
 		if (index%two==one) {
@@ -261,7 +257,7 @@ int main()
 				mousePx = Mouse::getPosition(window).x;
 				mousePy = Mouse::getPosition(window).y;
 
-				if (mainPanels[zero].getLocalBounds().contains(mousePx, mousePy)) {//check if left panel clicked on
+				if (mainPanels[zero].getGlobalBounds().contains(mousePx, mousePy)) {//check if left panel clicked on
 					for (int i = 0;i < numOfTools;i++) {
 						if (panels[i].getGlobalBounds().contains(mousePx, mousePy)) {
 							selectedTool = tools[i];//gets selected tool keyword
@@ -346,173 +342,7 @@ int main()
 
 				}
 			}
-<<<<<<< HEAD
-<<<<<<< HEAD
-		
-			if(selectedTool=="Copy_paste") {
-				if (switched) {//check if swtiched and set color to null(so it does not draw)
-					currColorInteger = -1;
-					switched = false;
-				}
-				show_map.clear();
-				keep_map.clear();
-				set = false;
-				firsTime = true;
-				draw = true;
-				orgColumn = 0, orgRow = 0;
-				prevColumn = 0, prevRow = 0;
-
-				while (Mouse::isButtonPressed(Mouse::Left) && currColorInteger > -1)// while it is selected
-				{
-					mousePx = Mouse::getPosition(window).x;
-					mousePy = Mouse::getPosition(window).y;
-					if ((mousePx > leftPanelW && mousePx < colorSpaceX) && (mousePy > zero && mousePy < height)) {
-						if (set == false) {
-							orgColumn = (mousePx - leftPanelW) / gSquareSize;//original x column
-							orgRow = (mousePy / gSquareSize); // original y column
-							set = true;
-						}
-
-						gridColumn = (mousePx - leftPanelW) / gSquareSize;
-						gridRow = mousePy / gSquareSize;
-
-						if (prevColumn == gridColumn && prevRow == gridRow) {
-
-							draw = false;
-
-						}
-						else {
-							prevColumn = gridColumn;
-							prevRow = gridRow;
-							show_map.insert(keep_map.begin(), keep_map.end());
-							for (auto i = show_map.begin();i != show_map.end();i++) {
-
-								gridDisplay[i->first][i->second].setFillColor(colorArray[zero]);
-								window.draw(gridDisplay[i->first][i->second]);
-							}
-							keep_map.clear();
-							draw = true;
-						}
-
-
-						if (firsTime == true) {
-							grid[gridRow][gridColumn] = currColorInteger;
-							gridDisplay[gridRow][gridColumn].setFillColor(colorArray[currColorInteger]);
-							window.draw(gridDisplay[gridRow][gridColumn]);
-							window.display();
-							firsTime = false;
-						}
-						else if ((orgColumn != gridColumn || orgRow != gridRow) && draw == true) {
-
-
-							cAcross = (gridColumn - orgColumn);//gives you how many columns need till 0 (back to the start)
-							rDown = (gridRow - orgRow);// gives you how many rows needed till 0(b to start)(use abs()back to 0)
-
-
-							if (cAcross >= zero) {//right & (up || down)
-
-								for (column = orgColumn;column <= gridColumn;column++) {//right
-
-									gridDisplay[orgRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[orgRow][column]);
-
-									gridDisplay[gridRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[gridRow][column]);
-
-									keep_map.insert({ orgRow,column });
-									keep_map.insert({ gridRow,column });
-								}
-								if (rDown > zero) {
-									for (row = orgRow;row <= gridRow; row++) {//down
-
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
-
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
-									}
-								}
-								else {
-									for (row = orgRow;row > gridRow; row--) {//up
-
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
-
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
-									}
-								}
-							}
-							else if (cAcross < zero) { //left & (down || UP )
-
-								for (column = orgColumn;column > gridColumn;column--) {
-
-									gridDisplay[orgRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[orgRow][column]);
-
-									gridDisplay[gridRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[gridRow][column]);
-
-
-									keep_map.insert({ orgRow,column });
-									keep_map.insert({ gridRow,column });
-								}
-								if (rDown >= zero) {
-									for (row = orgRow;row <= gridRow; row++) {//down
-
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
-
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
-									}
-								}
-								else {
-									for (row = orgRow;row >= gridRow; row--) {//up
-
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
-
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
-									}
-								}
-							}
-							window.display();
-							draw = false;
-						}
-
-					}
-
-
-
-				}
-				for (auto index = keep_map.begin();index != keep_map.end();index++) {
-
-					grid[index->first][index->second] = currColorInteger;
-				}
-
-			}
-			
 			if (selectedTool=="Rectangle")
-=======
-			else if (selectedTool=="Rectangle")
->>>>>>> parent of aaa584e (20/02/2021 copy&paste image set up)
-=======
-			else if (selectedTool=="Rectangle")
->>>>>>> parent of aaa584e (20/02/2021 copy&paste image set up)
 			{
 				if (switched) {//check if swtiched and set color to null(so it does not draw)
 					currColorInteger = -1;
@@ -551,8 +381,9 @@ int main()
 							show_map.insert(keep_map.begin(), keep_map.end());
 							for (auto i = show_map.begin();i != show_map.end();i++) {
 
-								gridDisplay[i->first][i->second].setFillColor(colorArray[zero]);
-								window.draw(gridDisplay[i->first][i->second]);
+								set_gridPeace(leftPanelW + i->second * gSquareSize, i->first * gSquareSize);//set Square at this location
+								gridPeace.setFillColor(colorArray[zero]);
+								window.draw(gridPeace);
 							}
 							keep_map.clear();
 							draw = true;
@@ -560,81 +391,91 @@ int main()
 
 
 						if (firsTime==true) {
+							set_gridPeace(leftPanelW + gridColumn * gSquareSize, gridRow* gSquareSize);//set Square at this location
 							grid[gridRow][gridColumn] = currColorInteger;
-							gridDisplay[gridRow][gridColumn].setFillColor(colorArray[currColorInteger]);
-							window.draw(gridDisplay[gridRow][gridColumn]);
+							window.draw(gridPeace);
 							window.display();
 							firsTime = false;
 						}
 						else if ((orgColumn != gridColumn || orgRow != gridRow)&& draw==true) {
 							
+							cAcross = (orgColumn - gridColumn);//gives you how many columns need till 0 (back to the start)
+							rDown = (orgRow - gridRow);// gives you how many rows needed till 0(b to start)(use abs()back to 0)
 
-							cAcross = (gridColumn-orgColumn);//gives you how many columns need till 0 (back to the start)
-							rDown = (gridRow-orgRow);// gives you how many rows needed till 0(b to start)(use abs()back to 0)
-
-
-							if (cAcross >= zero) {//right & (up || down)
+							if (cAcross <= zero) {//right & (up || down)
 
 								for (column = orgColumn;column <= gridColumn;column++) {//right
 
-									gridDisplay[orgRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[orgRow][column]);
 
-									gridDisplay[gridRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[gridRow][column]);
+									set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
+
+									set_gridPeace(leftPanelW + column * gSquareSize, gridRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
 
 									keep_map.insert({ orgRow,column });
 									keep_map.insert({ gridRow,column });
 								}
 								if (rDown > zero) {
-									for (row = orgRow;row <= gridRow; row++) {//down
+									for (row = orgRow;row >= gridRow; row--) {//up
 
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
 
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 
 										keep_map.insert({ row,orgColumn });
 										keep_map.insert({ row,gridColumn });
 									}
 								}
 								else {
-									for (row = orgRow;row > gridRow; row--) {//up
+									for (row = orgRow;row <= gridRow; row++) {//down
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
-
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 
 										keep_map.insert({ row,orgColumn });
 										keep_map.insert({ row,gridColumn });
 									}
 								}
 							}
-							else if (cAcross < zero) { //left & (down || UP )
+							else if (cAcross > zero) { //left & (down || UP )
 
 								for (column = orgColumn;column > gridColumn;column--) {
 
-									gridDisplay[orgRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[orgRow][column]);
 
-									gridDisplay[gridRow][column].setFillColor(colorArray[currColorInteger]);
-									window.draw(gridDisplay[gridRow][column]);
+									set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
 
+									set_gridPeace(leftPanelW + column * gSquareSize, gridRow * gSquareSize);
+									gridPeace.setFillColor(colorArray[currColorInteger]);
+									window.draw(gridPeace);
 
 									keep_map.insert({ orgRow,column });
 									keep_map.insert({ gridRow,column });
 								}
-								if (rDown >= zero) {
+								if (rDown <= zero) {
 									for (row = orgRow;row <= gridRow; row++) {//down
 
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
 
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 
 										keep_map.insert({ row,orgColumn });
 										keep_map.insert({ row,gridColumn });
@@ -643,11 +484,14 @@ int main()
 								else {
 									for (row = orgRow;row >= gridRow; row--) {//up
 
-										gridDisplay[row][orgColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][orgColumn]);
 
-										gridDisplay[row][gridColumn].setFillColor(colorArray[currColorInteger]);
-										window.draw(gridDisplay[row][gridColumn]);
+										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+
+										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
 
 										keep_map.insert({ row,orgColumn });
 										keep_map.insert({ row,gridColumn });
@@ -697,11 +541,11 @@ int main()
 			}
 			window.clear();
 			
-			//with no pre-made grid
+			/*
 			int dsiplayColor=0;
 			for (int r = 0;r < rows;r++) {
 				for (int c = 0;c < colms;c++) {
-					dsiplayColor = grid[r][c];
+					dsiplayColor=grid[r][c];
 					if (dsiplayColor!=0) {
 						gridDisplay[r][c].setFillColor(colorArray[grid[r][c]]);
 					}
@@ -711,8 +555,10 @@ int main()
 					window.draw(gridDisplay[r][c]);
 				}
 			}
+			*/
+			//--------------------------------------------
 			
-			/*
+			//with no pre-made grid
 			int pSize = 0;
 			int yposs = 0;
 			int temp = 0;
@@ -722,7 +568,6 @@ int main()
 			for (int r = 0;r < rows;r++) {
 				yposs += pSize;
 				temp = xposs;
-			
 				for (int c = 0;c < colms;c++) {
 					set_gridPeace(temp += gSquareSize, yposs);
 					gridPeace.setFillColor(colorArray[grid[r][c]]);
@@ -730,7 +575,7 @@ int main()
 				}
 				pSize = gSquareSize;
 			}
-			*/
+			
 			for (index = 0;index < mainPanels.size();index++) {//draw panels
 				window.draw(mainPanels[index]);
 
