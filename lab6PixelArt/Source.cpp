@@ -61,7 +61,9 @@ void saveToFile() {
 
 		for (int r = zero;r < rows;r++) {
 			for (int c = zero;c < colms;c++) {
-				myFile << grid[r][c] << ','<< r <<","<< c << ','<<'\n';
+				if (grid[r][c]!=0) {
+					myFile << grid[r][c] << ','<< r <<","<< c << ','<<'\n';
+				}
 			}
 		}
 		cout << "Saved\n";
@@ -83,6 +85,8 @@ void loadFile() {
 					grid[stoi(row)][stoi(column)]= stoi(colorIndex);
 					getline(myFile, colorIndex);
 				
+
+
 			}
 	}
 }
@@ -269,12 +273,12 @@ int main()
 							break;
 						}
 					}
-					if (saveBtn.getGlobalBounds().contains(mousePx, mousePy)) {
-						saveToFile();
-					}
-					else if (loadBtn.getGlobalBounds().contains(mousePx, mousePy)) {
-						loadFile();
-					}
+				}
+				else if (saveBtn.getGlobalBounds().contains(mousePx,mousePy)) {
+					saveToFile();
+				}
+				else if (loadBtn.getGlobalBounds().contains(mousePx, mousePy)) {
+					loadFile();
 				}
 
 			}
@@ -728,7 +732,7 @@ int main()
 			{
 				window.draw(colourButtons[i]);
 			}	
-			set_rectange(100,50,80,height-200);
+			set_rectange(100,50,100,height-200);
 			panel.setFillColor(Color::Red);
 			panel.setOutlineThickness(one);
 			panel.setOutlineColor(Color::Black);
