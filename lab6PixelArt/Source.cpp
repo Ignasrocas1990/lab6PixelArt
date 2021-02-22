@@ -61,9 +61,7 @@ void saveToFile() {
 
 		for (int r = zero;r < rows;r++) {
 			for (int c = zero;c < colms;c++) {
-				if (grid[r][c]!=0) {
-					myFile << grid[r][c] << ','<< r <<","<< c << ','<<'\n';
-				}
+				myFile << grid[r][c] << ','<< r <<","<< c << ','<<'\n';
 			}
 		}
 		cout << "Saved\n";
@@ -277,13 +275,14 @@ int main()
 							break;
 						}
 					}
+					if (saveBtn.getGlobalBounds().contains(mousePx, mousePy)) {
+						saveToFile();
+					}
+					else if (loadBtn.getGlobalBounds().contains(mousePx, mousePy)) {
+						loadFile();
+					}
 				}
-				else if (saveBtn.getGlobalBounds().contains(mousePx,mousePy)) {
-					saveToFile();
-				}
-				else if (loadBtn.getGlobalBounds().contains(mousePx, mousePy)) {
-					loadFile();
-				}
+				
 
 			}
 			if (selectedTool == "Pencil" || selectedTool=="Rectangle") {//get color
@@ -744,7 +743,7 @@ int main()
 			{
 				window.draw(colourButtons[i]);
 			}	
-			set_rectange(100,50,100,height-200);
+			set_rectange(100,50,80,height-200);
 			panel.setFillColor(Color::Red);
 			panel.setOutlineThickness(one);
 			panel.setOutlineColor(Color::Black);
