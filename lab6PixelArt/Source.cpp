@@ -348,6 +348,7 @@ int main()
 				}
 			}
 <<<<<<< HEAD
+<<<<<<< HEAD
 		
 			if(selectedTool=="Copy_paste") {
 				if (switched) {//check if swtiched and set color to null(so it does not draw)
@@ -507,6 +508,9 @@ int main()
 			}
 			
 			if (selectedTool=="Rectangle")
+=======
+			else if (selectedTool=="Rectangle")
+>>>>>>> parent of aaa584e (20/02/2021 copy&paste image set up)
 =======
 			else if (selectedTool=="Rectangle")
 >>>>>>> parent of aaa584e (20/02/2021 copy&paste image set up)
