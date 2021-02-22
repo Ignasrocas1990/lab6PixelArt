@@ -20,41 +20,79 @@
 #include <vector>
 using namespace std;
 using namespace sf;
-const int zero = 0,one=1,two=2,three=3;
+const int zero = 0,one=1,two=2,three=3,four=4;
 const int colms = 48, rows = 60;
 const int gSquareSize = 25;
 int index = 0,r=0,c=0,i=0;
-
-const Color colorArray[] = { Color(103, 103, 103),Color::Blue,Color::Red,Color::Cyan,Color::Green };
-RectangleShape gridPeace;
-RectangleShape panel;
-int grid[rows][colms] = {0};
-//RectangleShape gridDisplay[rows][colms];
-
+const int numOfColourButtons = 21, numOfTools = 4;
+const float tickness = 4.f;
+Font font;
+const Color colorArray[] = { Color::White,Color(153,0,26),Color(51,26,0),Color::Red,Color(255,179,191),Color(255,128,128),Color(255,85,0),Color::Yellow,Color(234,255,128),Color(191,230,0),Color::Green,Color(0,51,0),Color(0,204,102),Color(0,77,230),Color(0,204,204),Color::Blue,Color(69,0,204),Color(77,0,153),Color(204,0,204),Color(191,0,230),Color::Black };
+RectangleShape colourButtons[numOfColourButtons];
 vector<RectangleShape> mainPanels;
 vector<RectangleShape> panels;
-Vertex aLine[two];
-
+RectangleShape saveBtn, loadBtn, gridPeace, panel;
+Texture saveTexture, loadTexture;
+Text text;
+int grid[rows][colms] = {0};
+vector<Sprite> btns;
+Sprite btn;
 
 void set_rectange(int width, int height, int x_poss, int y_poss) {//set's a Rectange properties
 	panel.setPosition(x_poss, y_poss);
 	panel.setSize(Vector2f(width, height));
 	panel.setFillColor(colorArray[zero]);
 }
+void set_text(String words,int x_poss,int y_poss) {
+	text.setFont(font);
+	text.setString(words);
+	text.setCharacterSize(40);
+	text.setOutlineThickness(1);
+	text.setPosition(x_poss,y_poss);
+	text.setFillColor(Color::White);
+}
 void set_gridPeace(int x_poss, int y_poss) {//set's a Rectange properties
 	gridPeace.setPosition(x_poss, y_poss);
 	gridPeace.setSize(Vector2f(gSquareSize, gSquareSize));
 	gridPeace.setFillColor(colorArray[zero]);
-	gridPeace.setOutlineThickness(1.f);
 	gridPeace.setOutlineColor(Color::Black);
+	gridPeace.setOutlineThickness(1);
+}
+void setColors(int poss_x) {
+	int blockSize = 50;
+	int side_poss = 0;
+	int top_poss = gSquareSize*5;
+	for (int i = 1; i < numOfColourButtons; i++)
+	{
+		int a = poss_x  + (side_poss+=blockSize+10);
+		colourButtons[i].setSize(Vector2f(blockSize, blockSize));//set's acual collor buttons
+		colourButtons[i].setFillColor(colorArray[i]);
+		colourButtons[i].setPosition(a, top_poss);
+		if (i % 5 == 0) {
+			side_poss = 0;
+			top_poss += 55;
+		}
+		side_poss++;
+	}
+}
+void createToolsBtns(int lPanelBlocksW) {
+	int possX = gSquareSize * 2, possY = gSquareSize*5;
+	for (int index = 1;index <= numOfTools; index++) {//create left panel tool blocks
+		if (index % two == one) {
+			set_rectange(lPanelBlocksW, lPanelBlocksW, possX, possY);
+			possX += lPanelBlocksW + gSquareSize;
+		}
+		else {
+			set_rectange(lPanelBlocksW, lPanelBlocksW, possX, possY);
+			possX -= lPanelBlocksW + gSquareSize;
+			possY += lPanelBlocksW + gSquareSize;
+		}
+		panel.setFillColor(colorArray[zero]);
+		panel.setOutlineThickness(2);
+		panels.push_back(panel);
+	}
+}
 
-}
-void set_line(int s_poss_x, int s_poss_y, int e_poss_x, int e_poss_y) {//set's a lines properties
-	aLine[zero] = Vertex(Vector2f(s_poss_x, s_poss_y));
-	aLine[one] = Vertex(Vector2f(e_poss_x, e_poss_y));
-	aLine[zero].color = Color(169, 169, 169);
-	aLine[one].color = Color(169, 169, 169);
-}
 void saveToFile() {
 	ofstream myFile("save.txt");
 	if (myFile.is_open()) {
@@ -88,25 +126,41 @@ void loadFile() {
 			}
 	}
 }
-/*
-void createGrid(int xposs=400) {
-	int pSize = 0;
-	int yposs = 0;
-	int temp = 0;
-	xposs -= gSquareSize;
+int importImages(string name,float scale_x,float scale_y,int poss_x,int poss_y) {
 
-	for (r = 0;r < rows;r++) {
-		yposs += pSize;
-		temp = xposs;
-		for (c = 0;c < colms;c++) {
-			set_gridPeace(temp += gSquareSize, yposs);
-			gridDisplay[r][c] = gridPeace;
-		}
-		pSize = gSquareSize;
+	Texture* texture = new Texture();
+	texture->setSmooth(true);
+	if (!texture->loadFromFile(name))
+	{
+		cout << "Image not able to load \n";
+		return 0;
 	}
-
+	else {
+		btn.scale(scale_x, scale_y);
+		btn.setTexture(*texture);
+		btn.setPosition(poss_x, poss_y);
+		btns.push_back(btn);
+	}
 }
-*/
+
+int saveAndload(int lPanelBlocksW,int height) {
+
+	if (!saveTexture.loadFromFile("save.png"))return 0;
+	if (!loadTexture.loadFromFile("load.png"))return 0;
+
+	set_rectange(lPanelBlocksW, lPanelBlocksW, 70, height - 200);
+	saveBtn = panel;
+	saveBtn.setFillColor(Color::Green);
+	saveBtn.setTexture(&saveTexture);
+	saveBtn.setOutlineThickness(four);
+
+
+	set_rectange(lPanelBlocksW, lPanelBlocksW, 230, height - 200);
+	loadBtn = panel;
+	loadBtn.setFillColor(Color::White);
+	loadBtn.setTexture(&loadTexture);
+	loadBtn.setOutlineThickness(four);
+}
 
 int main()
 {
@@ -118,103 +172,34 @@ int main()
 	int mousePx = 0, mousePy = 0;
 	int lPanelBlocksW = leftPanelW / 3;
 	bool switched = false;
-	const int numOfColourButtons = 4,numOfTools=6;
-	const string tools[] = { "Rubber","Pencil","Picker","Rectangle","Copy_paste","empty"};
+	const string tools[] = { "Rubber","Pencil","Picker","Rectangle"};//,"Copy_paste","empty"
 
-
-	//create Window
 
 	RenderWindow window(VideoMode(width, height), "SFML Sample Code Lab 7");
 	
-	RectangleShape saveBtn,loadBtn;
-	int num = 0;
-	Font font;
-	//arial.ttf must be in the same fodler as this code
 	if (!font.loadFromFile("arial.ttf"))
-	{
-		// error...
-	}
-
-	Text saveText;
-	saveText.setFont(font);
-	saveText.setString(" Save ");
-	saveText.setCharacterSize(24);
-	saveText.setFillColor(Color::White);
+		cout << "Error on loading Font file\n";
 	
-	RectangleShape colourButtons[numOfColourButtons];
+	setColors(colorSpaceX);
 
-	for (int i = 0; i < numOfColourButtons; i++)
-	{
-		colourButtons[i].setSize(Vector2f(gSquareSize, gSquareSize));//set's acual collor buttons
-		colourButtons[i].setPosition(colorSpaceX+ gSquareSize +(i* gSquareSize), gSquareSize);
-		colourButtons[i].setFillColor(colorArray[i+1]);
-	}
 	set_rectange(leftPanelW, height, zero, zero);//draw left panel
+	panel.setFillColor(colorArray[20]);
 	mainPanels.push_back(panel);
 
-	set_rectange(colorSpaceW, colorSpaceH, colorSpaceX,zero);//draw color space
+	set_rectange(colorSpaceW, colorSpaceH, colorSpaceX,zero);
+	panel.setFillColor(colorArray[20]);
 	mainPanels.push_back(panel);
 
-	Texture pencilTexture;
-	if (!pencilTexture.loadFromFile("pen.png"))//-----------need class array loop...
-	{
-		cout << "Pen image not able to load \n";
-		return 0;
-	}
-	Sprite pencilButton;
-	pencilButton.setTexture(pencilTexture);
-	pencilButton.setPosition(leftPanelW / two + 5, gSquareSize);
-	pencilButton.scale(0.25, 0.25);
+	importImages("square.png", 0.04f, 0.04f, leftPanelW / two + 15, (colorSpaceH-80));
+	importImages("picker.png", 4.8f, 4.8f, gSquareSize * 2+10, colorSpaceH-80);
+	importImages("rubber.png", 1.3f, 1.3f, gSquareSize * 2, gSquareSize*5);
+	importImages("pen.png", 1.f, 1.f, leftPanelW / two + 5, gSquareSize*5);
 
+	saveAndload(lPanelBlocksW,height);
 
-	Texture rubberTexture;
-	rubberTexture.loadFromFile("rubber.png");
-	Sprite rubberButton;
-	rubberButton.setTexture(rubberTexture);
-	rubberButton.setPosition(gSquareSize * 2, gSquareSize);
-	rubberButton.scale(0.25, 0.25);
+	createToolsBtns(lPanelBlocksW);
 
-
-	Texture pickerTexture;
-	pickerTexture.loadFromFile("picker.png");
-	Sprite pickerButton;
-	pickerButton.setTexture(pickerTexture);
-	pickerButton.setPosition(gSquareSize * 2, leftPanelW/two);
-	pickerButton.scale(0.42, 0.42);
-
-	Texture rectangleTexture;
-	rectangleTexture.loadFromFile("rectangle.png");
-	Sprite rectangleBtn;
-	rectangleBtn.setTexture(rectangleTexture);
-	rectangleBtn.setPosition(leftPanelW / two+10, (leftPanelW/two)-10);
-	rectangleBtn.scale(0.074, 0.08);
-	rectangleBtn.setColor(Color::Red);
-
-
-	Texture copy_paste;
-	copy_paste.loadFromFile("copy.png");
-	Sprite copy_pasteBtn;
-	copy_pasteBtn.setTexture(copy_paste);
-	copy_pasteBtn.setPosition(gSquareSize * 2+5,(height / 4)-32);
-	copy_pasteBtn.scale(0.49, 0.49);
-
-
-
-	int possX = gSquareSize*2,possY= gSquareSize;
-	for (int index = 1;index <= numOfTools; index++) {//create left panel tool blocks
-		if (index%two==one) {
-			set_rectange(lPanelBlocksW, lPanelBlocksW, possX, possY);
-			possX += lPanelBlocksW + gSquareSize;
-		}
-		else {
-			set_rectange(lPanelBlocksW, lPanelBlocksW, possX, possY);
-			possX -= lPanelBlocksW + gSquareSize;
-			possY += lPanelBlocksW + gSquareSize;
-		}
-		panel.setFillColor(colorArray[zero]);
-		panel.setOutlineThickness(2);//set color maybe later
-		panels.push_back(panel);
-	}
+	
 
 	Time timePerFrame = seconds(0.5f / 60.0f);
 	Time timeSinceLastUpdate = Time::Zero;
@@ -222,6 +207,7 @@ int main()
 	clock.restart();
 
 	int currColorInteger=-1;
+	int prevColorInt = -1;
 	int curToolIndex = -1;
 	int gridRow = 0, gridColumn = 0;
 	int rectangeX = 0, rectangeY = 0;
@@ -230,11 +216,10 @@ int main()
 	multimap<int, int>keep_map;
 	int row = 0, column = 0;
 	int cAcross=0, rDown=0;
-	bool set = false;
-	bool firsTime = true;
-	bool draw = true;
+	bool set = false,draw=true;
 	int orgColumn = 0, orgRow = 0;
 	int prevColumn = 0, prevRow = 0;
+
 
 	while (window.isOpen())
 	{
@@ -263,7 +248,7 @@ int main()
 							selectedTool = tools[i];//gets selected tool keyword
 							panels[i].setFillColor(Color::Blue);
 							if (curToolIndex != -1 && i != curToolIndex) {
-								panels[curToolIndex].setFillColor(colorArray[0]);
+								panels[curToolIndex].setFillColor(colorArray[zero]);
 
 							}
 							window.display();
@@ -291,11 +276,22 @@ int main()
 						currColorInteger = -1;
 						switched = false;
 					}
-					for (int i = 0; i < numOfColourButtons; i++)//check number of blocks
+
+					for (int i = 1; i < numOfColourButtons; i++)//check number of blocks
 					{
 						if (colourButtons[i].getGlobalBounds().contains(mousePx, mousePy))
 						{
-							currColorInteger = i + 1;
+							if (currColorInteger !=-1 && i != currColorInteger) {
+
+								colourButtons[currColorInteger].setOutlineThickness(0.0f);
+								window.draw(colourButtons[currColorInteger]);
+
+							}
+							currColorInteger = i;
+							colourButtons[i].setOutlineThickness(tickness);
+							colourButtons[i].setOutlineColor(Color::White);
+							window.draw(colourButtons[i]);
+							
 							//colorSelected = true;
 							break;
 
@@ -308,12 +304,18 @@ int main()
 			else if (selectedTool == "Rubber") 
 			{
 				//currColor = colorArray[0];//dont change
+				if (currColorInteger !=-1) {
+					colourButtons[currColorInteger].setOutlineThickness(0.f);
+					window.draw(colourButtons[currColorInteger]);
+				}
 				currColorInteger = 0;
 				switched = true;
 			}
 			else if (selectedTool == "Picker")
 			{
-				if (switched) {//check if swtiched and set color to null(so it does not draw)
+				if (currColorInteger!=-1) {//check if swtiched and set color to null(so it does not draw)
+					colourButtons[currColorInteger].setOutlineThickness(0.f);
+					window.draw(colourButtons[currColorInteger]);
 					currColorInteger = -1;
 					switched = false;
 				}
@@ -327,6 +329,9 @@ int main()
 							gridRow = mousePy / gSquareSize;
 							currColorInteger= grid[gridRow][gridColumn];
 							if (currColorInteger != 0) {
+								colourButtons[currColorInteger].setOutlineThickness(tickness);
+								colourButtons[currColorInteger].setOutlineColor(Color::White);
+								window.draw(colourButtons[currColorInteger]);
 								selectedTool = "Pencil";
 								curToolIndex = one;
 								panels[one].setFillColor(Color::Blue);
@@ -342,16 +347,31 @@ int main()
 
 				}
 			}
+			/*
+			if (selectedTool == "Copy_paste") {
+				currColorInteger = -1;
+				switched = true;
+				while (Mouse::isButtonPressed(Mouse::Left)) {
+					mousePx = Mouse::getPosition(window).x;
+					mousePy = Mouse::getPosition(window).y;
+					if ((mousePx > leftPanelW && mousePx < colorSpaceX) && (mousePy > zero && mousePy < height)) {//keep in on the grid
+						//set_rectange(leftPanelW + gridColumn * gSquareSize, gridRow * gSquareSize);
+					}
+				}
+			}
+			*/
 			if (selectedTool=="Rectangle")
 			{
 				if (switched) {//check if swtiched and set color to null(so it does not draw)
+					colourButtons[currColorInteger].setOutlineThickness(tickness);
+					colourButtons[currColorInteger].setOutlineColor(Color::White);
+					window.draw(colourButtons[currColorInteger]);
 					currColorInteger = -1;
 					switched = false;
 				}
 				show_map.clear();
 				keep_map.clear();
 				set = false;
-				firsTime=true;
 				draw = true;
 				orgColumn = 0, orgRow = 0;
 				prevColumn = 0, prevRow = 0;
@@ -365,6 +385,11 @@ int main()
 							orgColumn = (mousePx - leftPanelW) / gSquareSize;//original x column
 							orgRow = (mousePy / gSquareSize); // original y column
 							set = true;
+
+							set_gridPeace(leftPanelW + orgColumn * gSquareSize, orgRow* gSquareSize);//set Square at this location
+							grid[orgRow][orgColumn] = currColorInteger;
+							gridPeace.setFillColor(colorArray[currColorInteger]);
+							window.draw(gridPeace);
 						}
 
 						gridColumn = (mousePx - leftPanelW) / gSquareSize;
@@ -390,14 +415,7 @@ int main()
 						}
 
 
-						if (firsTime==true) {
-							set_gridPeace(leftPanelW + gridColumn * gSquareSize, gridRow* gSquareSize);//set Square at this location
-							grid[gridRow][gridColumn] = currColorInteger;
-							window.draw(gridPeace);
-							window.display();
-							firsTime = false;
-						}
-						else if ((orgColumn != gridColumn || orgRow != gridRow)&& draw==true) {
+						if ((orgColumn != gridColumn || orgRow != gridRow)&& draw==true) {
 							
 							cAcross = (orgColumn - gridColumn);//gives you how many columns need till 0 (back to the start)
 							rDown = (orgRow - gridRow);// gives you how many rows needed till 0(b to start)(use abs()back to 0)
@@ -405,47 +423,55 @@ int main()
 							if (cAcross <= zero) {//right & (up || down)
 
 								for (column = orgColumn;column <= gridColumn;column++) {//right
+									if (grid[orgRow][column] == 0) {
 
-
-									set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
-									gridPeace.setFillColor(colorArray[currColorInteger]);
-									window.draw(gridPeace);
-
-									set_gridPeace(leftPanelW + column * gSquareSize, gridRow * gSquareSize);
-									gridPeace.setFillColor(colorArray[currColorInteger]);
-									window.draw(gridPeace);
-
-									keep_map.insert({ orgRow,column });
-									keep_map.insert({ gridRow,column });
+										set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+										keep_map.insert({ orgRow,column });
+									}
+									if(grid[gridRow][column] == 0){
+										set_gridPeace(leftPanelW + column * gSquareSize, gridRow * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+										keep_map.insert({ gridRow,column });
+									}
+									
 								}
 								if (rDown > zero) {
 									for (row = orgRow;row >= gridRow; row--) {//up
-
+										if (grid[row][orgColumn] == 0) {
 
 										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
 										gridPeace.setFillColor(colorArray[currColorInteger]);
 										window.draw(gridPeace);
-
-										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
-
 										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
+
+										}
+										if (grid[row][gridColumn] == 0) {
+											set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
+
+											keep_map.insert({ row,gridColumn });
+										}
 									}
 								}
 								else {
 									for (row = orgRow;row <= gridRow; row++) {//down
-										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
+										if (grid[row][orgColumn] == 0) {
+											set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
+											keep_map.insert({ row,orgColumn });
+										}
+										if (grid[row][gridColumn] == 0) {
+											set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
 
-										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
+											keep_map.insert({ row,gridColumn });
+										}
 									}
 								}
 							}
@@ -453,48 +479,50 @@ int main()
 
 								for (column = orgColumn;column > gridColumn;column--) {
 
-
-									set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
-									gridPeace.setFillColor(colorArray[currColorInteger]);
-									window.draw(gridPeace);
-
-									set_gridPeace(leftPanelW + column * gSquareSize, gridRow * gSquareSize);
-									gridPeace.setFillColor(colorArray[currColorInteger]);
-									window.draw(gridPeace);
-
-									keep_map.insert({ orgRow,column });
-									keep_map.insert({ gridRow,column });
+									if (grid[orgRow][column] == 0) {
+										set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+										keep_map.insert({ orgRow,column });
+									}
+									if (grid[gridRow][column] == 0) {
+										set_gridPeace(leftPanelW + column * gSquareSize, gridRow * gSquareSize);
+										gridPeace.setFillColor(colorArray[currColorInteger]);
+										window.draw(gridPeace);
+										keep_map.insert({ gridRow,column });
+									}
 								}
 								if (rDown <= zero) {
 									for (row = orgRow;row <= gridRow; row++) {//down
-
-
-										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
-
-										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
+										if (grid[row][orgColumn] == 0) {
+											set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
+											keep_map.insert({ row,orgColumn });
+										}
+										if (grid[row][gridColumn] == 0) {
+											set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
+											keep_map.insert({ row,gridColumn });
+										}
 									}
 								}
 								else {
 									for (row = orgRow;row >= gridRow; row--) {//up
 
-
-										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
-
-										set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
-										gridPeace.setFillColor(colorArray[currColorInteger]);
-										window.draw(gridPeace);
-
-										keep_map.insert({ row,orgColumn });
-										keep_map.insert({ row,gridColumn });
+										if (grid[row][orgColumn] == 0) {
+											set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
+											keep_map.insert({ row,orgColumn });
+										}
+										if (grid[row][gridColumn] == 0) {
+											set_gridPeace(leftPanelW + gridColumn * gSquareSize, row * gSquareSize);
+											gridPeace.setFillColor(colorArray[currColorInteger]);
+											window.draw(gridPeace);
+											keep_map.insert({ row,gridColumn });
+										}
 										}
 									}
 							}
@@ -532,7 +560,6 @@ int main()
 							window.draw(gridPeace);
 							window.display();
 						}
-
 
 					}
 				}
@@ -588,28 +615,32 @@ int main()
 			{
 				window.draw(colourButtons[i]);
 			}	
-			set_rectange(100,50,80,height-200);
-			panel.setFillColor(Color::Red);
-			panel.setOutlineThickness(one);
-			panel.setOutlineColor(Color::Black);
-			saveBtn = panel;
-			window.draw(saveBtn);
 
-			set_rectange(100, 50, 200, height - 200);
-			panel.setFillColor(Color::Blue);
-			panel.setOutlineThickness(one);
-			loadBtn = panel;
+			window.draw(saveBtn);
 			window.draw(loadBtn);
 
-			
-			window.draw(pencilButton);
-			window.draw(rubberButton);
-			window.draw(pickerButton);
-			window.draw(rectangleBtn);
-			window.draw(copy_pasteBtn);
-			window.display();
+			for (auto index = btns.begin();index != btns.end();index++) {
+				window.draw(*index);
+			}
+			set_text("Drawing Tools", leftPanelW / 5, gSquareSize);
+			text.setOutlineColor(Color::Red);
+			window.draw(text);
 
-			// reset the timeSinceLastUpdate to 0 
+			set_text("Colors", colorSpaceX+leftPanelW/3, gSquareSize);
+			text.setOutlineColor(Color::Red);
+			window.draw(text);
+
+			set_text("Save", 90, height-250);
+			text.setOutlineColor(Color::Green);
+			window.draw(text);
+
+			set_text("Load", 250, height-250);
+			text.setOutlineColor(Color::Blue);
+			window.draw(text);
+
+
+
+			window.display();
 			timeSinceLastUpdate = Time::Zero;
 		}
 	}
