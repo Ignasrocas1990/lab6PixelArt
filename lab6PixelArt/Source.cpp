@@ -43,7 +43,7 @@ void set_rectange(int width, int height, int x_poss, int y_poss) {//set's a Rect
 	panel.setSize(Vector2f(width, height));
 	panel.setFillColor(colorArray[zero]);
 }
-void set_text(String words,int x_poss,int y_poss) {
+void set_text(String words,int x_poss,int y_poss) {//set text properties
 	text.setFont(font);
 	text.setString(words);
 	text.setCharacterSize(40);
@@ -58,14 +58,14 @@ void set_gridPeace(int x_poss, int y_poss) {//set's a Rectange properties
 	gridPeace.setOutlineColor(Color::Black);
 	gridPeace.setOutlineThickness(1);
 }
-void setColors(int poss_x) {
+void setColors(int poss_x) {//create's color blocks with colors
 	int blockSize = 50;
 	int side_poss = 0;
 	int top_poss = gSquareSize*5;
 	for (int i = 1; i < numOfColourButtons; i++)
 	{
 		int a = poss_x  + (side_poss+=blockSize+10);
-		colourButtons[i].setSize(Vector2f(blockSize, blockSize));//set's acual collor buttons
+		colourButtons[i].setSize(Vector2f(blockSize, blockSize));
 		colourButtons[i].setFillColor(colorArray[i]);
 		colourButtons[i].setPosition(a, top_poss);
 		if (i % 5 == 0) {
@@ -75,9 +75,9 @@ void setColors(int poss_x) {
 		side_poss++;
 	}
 }
-void createToolsBtns(int lPanelBlocksW) {
+void createToolsBtns(int lPanelBlocksW) {//create left panel tool blocks
 	int possX = gSquareSize * 2, possY = gSquareSize*5;
-	for (int index = 1;index <= numOfTools; index++) {//create left panel tool blocks
+	for (int index = 1;index <= numOfTools; index++) {
 		if (index % two == one) {
 			set_rectange(lPanelBlocksW, lPanelBlocksW, possX, possY);
 			possX += lPanelBlocksW + gSquareSize;
@@ -93,7 +93,7 @@ void createToolsBtns(int lPanelBlocksW) {
 	}
 }
 
-void saveToFile() {
+void saveToFile() {//save entire grid to file(saved as: Color,row Possition,Column Possition)
 	ofstream myFile("save.txt");
 	if (myFile.is_open()) {
 
@@ -109,7 +109,7 @@ void saveToFile() {
 	}
 	
 }
-void loadFile() {
+void loadFile() {//loads from file
 	string colorIndex="",row="",column="";
 	
 	ifstream myFile("save.txt"); 
@@ -120,13 +120,10 @@ void loadFile() {
 					getline(myFile, column, ',');
 					grid[stoi(row)][stoi(column)]= stoi(colorIndex);
 					getline(myFile, colorIndex);
-				
-
-
 			}
 	}
 }
-int importImages(string name,float scale_x,float scale_y,int poss_x,int poss_y) {
+int importImages(string name,float scale_x,float scale_y,int poss_x,int poss_y) {//create's texture,add it to sprite
 
 	Texture* texture = new Texture();
 	texture->setSmooth(true);
@@ -143,7 +140,7 @@ int importImages(string name,float scale_x,float scale_y,int poss_x,int poss_y) 
 	}
 }
 
-int saveAndload(int lPanelBlocksW,int height) {
+int saveAndload(int lPanelBlocksW,int height) {//set's up save and load buttons
 
 	if (!saveTexture.loadFromFile("save.png"))return 0;
 	if (!loadTexture.loadFromFile("load.png"))return 0;
@@ -165,20 +162,19 @@ int saveAndload(int lPanelBlocksW,int height) {
 int main()
 {
 	int width = 2000, height = 1500;
-	int colorSpaceW = width / 5, colorSpaceH = height / 4;//w=400 h=375
+	int colorSpaceW = width / 5, colorSpaceH = height / 4;
 	int colorSpaceX = width - colorSpaceW;
 	int leftPanelW = colorSpaceW;
-	int gridW = width - (colorSpaceW + leftPanelW);//1200
+	int gridW = width - (colorSpaceW + leftPanelW);
 	int mousePx = 0, mousePy = 0;
 	int lPanelBlocksW = leftPanelW / 3;
 	bool switched = false;
-	const string tools[] = { "Rubber","Pencil","Picker","Rectangle"};//,"Copy_paste","empty"
+	const string tools[] = { "Rubber","Pencil","Picker","Rectangle"};
 
 
-	RenderWindow window(VideoMode(width, height), "SFML Sample Code Lab 7");
+	RenderWindow window(VideoMode(width, height), "Pixel Draw");
 	
-	if (!font.loadFromFile("arial.ttf"))
-		cout << "Error on loading Font file\n";
+	if (!font.loadFromFile("arial.ttf")) cout << "Error on loading Font file\n";
 	
 	setColors(colorSpaceX);
 
@@ -225,7 +221,6 @@ int main()
 	{
 		 gridRow = 0, gridColumn = 0;
 
-		// check if the close window button is clicked on.
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -266,18 +261,18 @@ int main()
 				
 
 			}
-			if (selectedTool == "Pencil" || selectedTool=="Rectangle") {//get color
+			if (selectedTool == "Pencil" || selectedTool=="Rectangle") {
 
-				if (Mouse::isButtonPressed(Mouse::Left))// if button clicked
+				if (Mouse::isButtonPressed(Mouse::Left))
 				{
 					mousePx = Mouse::getPosition(window).x;
 					mousePy = Mouse::getPosition(window).y;
-					if (switched) {//check if swtiched and set color to null(so it does not draw)
+					if (switched) {
 						currColorInteger = -1;
 						switched = false;
 					}
 
-					for (int i = 1; i < numOfColourButtons; i++)//check number of blocks
+					for (int i = 1; i < numOfColourButtons; i++)
 					{
 						if (colourButtons[i].getGlobalBounds().contains(mousePx, mousePy))
 						{
@@ -292,7 +287,6 @@ int main()
 							colourButtons[i].setOutlineColor(Color::White);
 							window.draw(colourButtons[i]);
 							
-							//colorSelected = true;
 							break;
 
 						}
@@ -303,7 +297,6 @@ int main()
 			}
 			else if (selectedTool == "Rubber") 
 			{
-				//currColor = colorArray[0];//dont change
 				if (currColorInteger !=-1) {
 					colourButtons[currColorInteger].setOutlineThickness(0.f);
 					window.draw(colourButtons[currColorInteger]);
@@ -313,13 +306,13 @@ int main()
 			}
 			else if (selectedTool == "Picker")
 			{
-				if (currColorInteger!=-1) {//check if swtiched and set color to null(so it does not draw)
+				if (currColorInteger!=-1) {
 					colourButtons[currColorInteger].setOutlineThickness(0.f);
 					window.draw(colourButtons[currColorInteger]);
 					currColorInteger = -1;
 					switched = false;
 				}
-				if (Mouse::isButtonPressed(Mouse::Left))// if button clicked
+				if (Mouse::isButtonPressed(Mouse::Left))
 				{
 					mousePx = Mouse::getPosition(window).x;
 					mousePy = Mouse::getPosition(window).y;
@@ -347,19 +340,6 @@ int main()
 
 				}
 			}
-			/*
-			if (selectedTool == "Copy_paste") {
-				currColorInteger = -1;
-				switched = true;
-				while (Mouse::isButtonPressed(Mouse::Left)) {
-					mousePx = Mouse::getPosition(window).x;
-					mousePy = Mouse::getPosition(window).y;
-					if ((mousePx > leftPanelW && mousePx < colorSpaceX) && (mousePy > zero && mousePy < height)) {//keep in on the grid
-						//set_rectange(leftPanelW + gridColumn * gSquareSize, gridRow * gSquareSize);
-					}
-				}
-			}
-			*/
 			if (selectedTool=="Rectangle")
 			{
 				if (switched) {//check if swtiched and set color to null(so it does not draw)
@@ -376,17 +356,18 @@ int main()
 				orgColumn = 0, orgRow = 0;
 				prevColumn = 0, prevRow = 0;
 
-				while (Mouse::isButtonPressed(Mouse::Left) && currColorInteger > -1)// while it is selected
+				while (Mouse::isButtonPressed(Mouse::Left) && currColorInteger > -1)
 				{
 					mousePx = Mouse::getPosition(window).x;
 					mousePy = Mouse::getPosition(window).y;
 					if ((mousePx > leftPanelW && mousePx < colorSpaceX) && (mousePy > zero && mousePy < height)) {
+
 						if (set == false) {
 							orgColumn = (mousePx - leftPanelW) / gSquareSize;//original x column
 							orgRow = (mousePy / gSquareSize); // original y column
 							set = true;
 
-							set_gridPeace(leftPanelW + orgColumn * gSquareSize, orgRow* gSquareSize);//set Square at this location
+							set_gridPeace(leftPanelW + orgColumn * gSquareSize, orgRow* gSquareSize);
 							grid[orgRow][orgColumn] = currColorInteger;
 							gridPeace.setFillColor(colorArray[currColorInteger]);
 							window.draw(gridPeace);
@@ -406,7 +387,7 @@ int main()
 							show_map.insert(keep_map.begin(), keep_map.end());
 							for (auto i = show_map.begin();i != show_map.end();i++) {
 
-								set_gridPeace(leftPanelW + i->second * gSquareSize, i->first * gSquareSize);//set Square at this location
+								set_gridPeace(leftPanelW + i->second * gSquareSize, i->first * gSquareSize);
 								gridPeace.setFillColor(colorArray[zero]);
 								window.draw(gridPeace);
 							}
@@ -422,7 +403,7 @@ int main()
 
 							if (cAcross <= zero) {//right & (up || down)
 
-								for (column = orgColumn;column <= gridColumn;column++) {//right
+								for (column = orgColumn+1;column <= gridColumn;column++) {//right
 									if (grid[orgRow][column] == 0) {
 
 										set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
@@ -440,7 +421,7 @@ int main()
 								}
 								if (rDown > zero) {
 									for (row = orgRow;row >= gridRow; row--) {//up
-										if (grid[row][orgColumn] == 0) {
+										if (grid[row-1][orgColumn] == 0) {
 
 										set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
 										gridPeace.setFillColor(colorArray[currColorInteger]);
@@ -459,7 +440,7 @@ int main()
 								}
 								else {
 									for (row = orgRow;row <= gridRow; row++) {//down
-										if (grid[row][orgColumn] == 0) {
+										if (grid[row+1][orgColumn] == 0) {
 											set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
 											gridPeace.setFillColor(colorArray[currColorInteger]);
 											window.draw(gridPeace);
@@ -477,7 +458,7 @@ int main()
 							}
 							else if (cAcross > zero) { //left & (down || UP )
 
-								for (column = orgColumn;column > gridColumn;column--) {
+								for (column = orgColumn-1;column > gridColumn;column--) {
 
 									if (grid[orgRow][column] == 0) {
 										set_gridPeace(leftPanelW + column * gSquareSize, orgRow * gSquareSize);
@@ -494,7 +475,7 @@ int main()
 								}
 								if (rDown <= zero) {
 									for (row = orgRow;row <= gridRow; row++) {//down
-										if (grid[row][orgColumn] == 0) {
+										if (grid[row+1][orgColumn] == 0) {
 											set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
 											gridPeace.setFillColor(colorArray[currColorInteger]);
 											window.draw(gridPeace);
@@ -511,7 +492,7 @@ int main()
 								else {
 									for (row = orgRow;row >= gridRow; row--) {//up
 
-										if (grid[row][orgColumn] == 0) {
+										if (grid[row][orgColumn-1] == 0) {
 											set_gridPeace(leftPanelW + orgColumn * gSquareSize, row * gSquareSize);
 											gridPeace.setFillColor(colorArray[currColorInteger]);
 											window.draw(gridPeace);
@@ -567,25 +548,7 @@ int main()
 
 			}
 			window.clear();
-			
-			/*
-			int dsiplayColor=0;
-			for (int r = 0;r < rows;r++) {
-				for (int c = 0;c < colms;c++) {
-					dsiplayColor=grid[r][c];
-					if (dsiplayColor!=0) {
-						gridDisplay[r][c].setFillColor(colorArray[grid[r][c]]);
-					}
-					else {
-						gridDisplay[r][c].setFillColor(colorArray[zero]);
-					}
-					window.draw(gridDisplay[r][c]);
-				}
-			}
-			*/
-			//--------------------------------------------
-			
-			//with no pre-made grid
+
 			int pSize = 0;
 			int yposs = 0;
 			int temp = 0;
