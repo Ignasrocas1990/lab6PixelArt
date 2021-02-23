@@ -102,26 +102,30 @@ void saveToFile() {//save entire grid to file(saved as: Color,row Possition,Colu
 				myFile << grid[r][c] << ','<< r <<","<< c << ','<<'\n';
 			}
 		}
-		cout << "Saved\n";
 	}
 	else {
 		cout << "unable to load save file\n";
 	}
 	
 }
-void loadFile() {//loads from file
+int loadFile() {//loads from file
 	string colorIndex="",row="",column="";
 	
 	ifstream myFile("save.txt"); 
-		if(myFile.is_open()){
+	if (myFile.is_open()) {
 
-			while (getline(myFile, colorIndex,',')) {
-					getline(myFile, row, ',');
-					getline(myFile, column, ',');
-					grid[stoi(row)][stoi(column)]= stoi(colorIndex);
-					getline(myFile, colorIndex);
-			}
+		while (getline(myFile, colorIndex, ',')) {
+			getline(myFile, row, ',');
+			getline(myFile, column, ',');
+			grid[stoi(row)][stoi(column)] = stoi(colorIndex);
+			getline(myFile, colorIndex);
+		}
+		return 1;
 	}
+	else {
+		return 0;
+	}
+	
 }
 int importImages(string name,float scale_x,float scale_y,int poss_x,int poss_y) {//create's texture,add it to sprite
 
@@ -253,9 +257,37 @@ int main()
 					}
 					if (saveBtn.getGlobalBounds().contains(mousePx, mousePy)) {
 						saveToFile();
+						set_text("Drawing Saved ", 80, height - 400);
+						text.setOutlineColor(Color::Red);
+						window.draw(text);
+						window.display();
+						sleep(seconds(1.f));
+						set_text("", 100, 500);
+						window.draw(text);
+						window.display();
+
+
+						
 					}
 					else if (loadBtn.getGlobalBounds().contains(mousePx, mousePy)) {
-						loadFile();
+						if (loadFile() != 0) {
+							set_text("Drawing loaded", 80, height - 400);
+							text.setOutlineColor(Color::Red);
+							window.draw(text);
+							window.display();
+						}
+						else {
+							set_text("No drawing has been saved", 10, height - 400);
+							text.setCharacterSize(30);
+							text.setOutlineColor(Color::Red);
+							window.draw(text);
+							window.display();
+						}
+						
+						sleep(seconds(1.f));
+						set_text("", 100, 500);
+						window.draw(text);
+						window.display();
 					}
 				}
 				
@@ -547,6 +579,7 @@ int main()
 
 
 			}
+			
 			window.clear();
 
 			int pSize = 0;
